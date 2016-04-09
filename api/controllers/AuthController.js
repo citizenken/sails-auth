@@ -93,8 +93,12 @@ module.exports = {
 
         // Upon successful login, optionally redirect the user if there is a
         // `next` query param
-        if (req.query.next) {
-          var url = sails.services.authservice.buildCallbackNextUrl(req);
+        var provider = req.param('provider'),
+            next = req.query.next ||
+            sails.config.passport[provider].nextUrl ||
+            sails.config.passport.global.nextUrl;
+        if (next) {
+          var url = sails.services.authservice.buildCallbackNextUrl(next, req);
           res.status(302).set('Location', url);
         }
 
