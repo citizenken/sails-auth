@@ -62,17 +62,7 @@ module.exports = {
     var action = req.param('action');
 
     function negotiateError(err) {
-      if (action === 'register') {
-        res.redirect('/register');
-      } else if (action === 'login') {
-        res.redirect('/login');
-      } else if (action === 'disconnect') {
-        res.redirect('back');
-      } else {
-        // make sure the server always returns a response to the client
-        // i.e passport-local bad username/email or password
-        res.send(403, err);
-      }
+      res.send(err.status, err);
     }
 
     sails.services.passport.callback(req, res, function (err, user) {
@@ -92,7 +82,12 @@ module.exports = {
         // Upon successful login, optionally redirect the user if there is a
         // `next` query param
         var provider = req.param('provider'),
-            next = req.query.next || sails.config.passport[provider].nextUrl || sails.config.passport.global.nextUrl;
+            next = null;
+
+        if (req.query.next || sails.config.passport[provider] && sails.config.passport[provider].nextUrl) {
+          next = req.query.next || sails.config.passport[provider].nextUrl;
+        }
+
         if (next) {
           var url = sails.services.authservice.buildCallbackNextUrl(next, req);
           res.status(302).set('Location', url);

@@ -203,7 +203,7 @@ passport.callback = function (req, res, next) {
   // having it tied into everything else.
   if (provider === 'local' && action !== undefined) {
     if (action === 'register' && !req.user) {
-      this.protocols.local.register(req, res, next);
+      this.protocols.local.register(req.body, next);
     } else if (action === 'connect' && req.user) {
       this.protocols.local.connect(req, res, next);
     } else if (action === 'disconnect' && req.user) {
